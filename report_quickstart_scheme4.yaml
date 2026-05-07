@@ -1,0 +1,49 @@
+# =========================
+# MintPy Word 报告：快速配置版
+# =========================
+# 适合新手：通常只需要修改下面 3 部分即可运行：
+# 1) paths
+# 2) cover_defaults
+# 3) report_options
+#
+# 如果你需要完全自定义章节树、素材、block 排列，请改用同目录下的 report_schema.yaml
+
+schema_version: quickstart-1.0
+project_name: MintPy Word Auto Report
+
+paths:
+  logo_path: /home/liyuxuan/penguin/pic2word/pic/logo.png
+  base_dir: /home/liyuxuan/penguin/data/Galapagos_s1/mintpy
+  output_dir: /home/liyuxuan/penguin/pic2word/v4_plus/word
+
+cover_defaults:
+  data_source: Sentinel-1
+  region_name: 北京
+  lead_author: yourname
+  output_name_template: "{user_inputs.region_name}InSAR处理报告.docx"
+
+processing_defaults:
+  ts_method: SBAS
+  analysis_text: "（请补充解译分析内容）"
+
+report_options:
+  include_chapter_3: true
+  include_chapter_4: true
+  include_chapter_5: true
+  include_poi_section: auto   # 可选: auto / true / false
+  auto_page_break_after_chapter: true
+
+captions_override:
+  velocity_map: "图{figure_no} 形变速率图"
+  velocity_std: "图{figure_no} VelocityStd"
+  poi_timeseries: "图{figure_no} 感兴趣目标点{item_index}的时序形变图"
+
+# 可选：章节标题覆盖
+# titles_override:
+#   chapter_3: "3. 干涉数据质量评估"
+#   chapter_4: "4. 形变结果"
+
+# 可选：高级默认参数覆盖
+# defaults_override:
+#   figure_width_cm: 13.5
+#   figure_max_height_cm: 13.0

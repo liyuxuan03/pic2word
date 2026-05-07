@@ -1,0 +1,328 @@
+# =========================
+# MintPy Word 报告：高级 schema 版
+# =========================
+# 适合需要完全控制报告结构的用户。
+# 如果你只是想快速改路径、封面和章节开关，请改用 report_quickstart.yaml。
+
+schema_version: '2.0'
+project:
+  name: MintPy Word Auto Report
+  language: zh-CN
+  description: 基于 MintPy 结果自动生成 Word 报告
+runtime_paths:
+  logo_path: /home/liyuxuan/penguin/pic2word/pic/logo.png
+  base_dir: /home/liyuxuan/penguin/data/Galapagos_s1/mintpy
+  pic_dir: '{runtime_paths.base_dir}/pic'
+  output_dir: /home/liyuxuan/penguin/pic2word/v4_plus/word
+  velocity_file: '{runtime_paths.base_dir}/velocity.h5'
+  cfg_file: '{runtime_paths.pic_dir}/smallbaselineApp.cfg'
+  rms_txt: '{runtime_paths.pic_dir}/rms_timeseriesResidual_ramp.txt'
+  reference_date_txt: '{runtime_paths.pic_dir}/reference_date.txt'
+  exclude_date_txt: '{runtime_paths.pic_dir}/exclude_date.txt'
+defaults:
+  font_cn: 仿宋
+  font_en: Times New Roman
+  figure_width_cm: 14.0
+  figure_max_height_cm: 14.0
+  table_style: Table Grid
+  missing_asset_policy: warn
+  auto_page_break_after_chapter: true
+  pdf_render_dpi: 300
+  figure_numbering_scope: chapter
+  table_numbering_scope: chapter
+data_sources:
+  mintpy_meta:
+    type: mintpy_attribute
+    path: '{runtime_paths.velocity_file}'
+  obs_dates:
+    type: text_file
+    path: '{runtime_paths.rms_txt}'
+    parser: date_list
+  mintpy_cfg:
+    type: cfg_file
+    path: '{runtime_paths.cfg_file}'
+  reference_dates:
+    type: text_file
+    path: '{runtime_paths.reference_date_txt}'
+    parser: inline_text
+  exclude_dates:
+    type: text_file
+    path: '{runtime_paths.exclude_date_txt}'
+    parser: inline_text
+  ts_method:
+    type: interactive
+    prompt: '>>> 请输入时序估计方法 (默认: SBAS): '
+    default: SBAS
+  analysis_text:
+    type: interactive
+    prompt: '>>> 请在此处输入分析内容: '
+    default: （请补充解译分析内容）
+  poi_figures:
+    type: glob
+    pattern: '{runtime_paths.pic_dir}/final_figure*.png'
+    sort: natural
+assets:
+  network_figure:
+    type: figure
+    path: '{runtime_paths.pic_dir}/network.pdf'
+  coherence_history:
+    type: figure
+    path: '{runtime_paths.pic_dir}/coherenceHistory.pdf'
+  coherence_matrix:
+    type: figure
+    path: '{runtime_paths.pic_dir}/coherenceMatrix.pdf'
+  avg_spatial_coh:
+    type: figure
+    path: '{runtime_paths.pic_dir}/geo_avgSpatialCoh.png'
+  temporal_coh:
+    type: figure
+    path: '{runtime_paths.pic_dir}/geo_temporalCoherence.png'
+  mask_conn_comp:
+    type: figure
+    path: '{runtime_paths.pic_dir}/maskConnComp.png'
+  avg_phase_velocity:
+    type: figure
+    path: '{runtime_paths.pic_dir}/avgPhaseVelocity.png'
+  unwrap_error:
+    type: figure
+    path: '{runtime_paths.pic_dir}/numTriNonzeroIntAmbiguity.png'
+  geometry_radar:
+    type: figure
+    path: '{runtime_paths.pic_dir}/geometryRadar.png'
+  residual_rms:
+    type: figure
+    path: '{runtime_paths.pic_dir}/rms_timeseriesResidual_ramp.pdf'
+  velocity_map:
+    type: figure
+    candidates:
+    - '{runtime_paths.pic_dir}/velocity_DEM.png'
+    - '{runtime_paths.pic_dir}/velocity.png'
+  velocity_std:
+    type: figure
+    path: '{runtime_paths.pic_dir}/velocity_std_plot.png'
+  poi_series:
+    type: figure_group
+    source: poi_figures
+templates:
+  headings:
+    cover_title: '基于{user_inputs.data_source}数据的{user_inputs.region_name}地区
+
+      时序InSAR地表形变处理与分析报告'
+  captions:
+    network: 图{figure_no} 干涉图网络。图中节点表示SAR影像的获取日期，连线表示用于生成干涉图的影像对。横轴为时间，纵轴为相对于参考影像的垂直基线（单位：米）。连线的颜色映射表示各干涉对的平均空间相干性数值，取值范围为0.2至1.0。
+    coherence_history: 图{figure_no} 相干性极值统计。图中横轴表示SAR影像的获取日期，纵轴表示平均空间相干性系数，取值范围为0至1。对于每一个观测日期，柱状图展示了与该影像相关联的所有干涉对的相干性极值统计。
+    coherence_matrix: 图{figure_no} 相干性矩阵。图中横轴与纵轴均表示SAR影像按获取时间先后排序的索引编号。
+    avg_spatial_coh: 图{figure_no} 地理编码后的平均空间相干性图。
+    temporal_coh: 图{figure_no} 地理编码后时间相干性图。
+    mask_conn_comp: 图{figure_no} 相位解缠连通分量观测掩膜。
+    avg_phase_velocity: 图{figure_no} 平均相位堆栈速率图。
+    unwrap_error: 图{figure_no} 相位解缠误差评估图。
+    geometry_radar: 图{figure_no} 雷达几何参数与辅助数据图。
+    residual_rms: 图{figure_no} 残余相位 RMS 可视化结果。
+    velocity_map: 图{figure_no} 形变速率图
+    velocity_std: 图{figure_no} VelocityStd
+    poi_timeseries: 图{figure_no} 感兴趣目标点{item_index}的时序形变图
+  text:
+    reference_dates: 参考日期：{value}
+    exclude_dates: 剔除日期：{value}
+report_structure:
+- type: cover
+  params:
+    data_source: interactive
+    region_name: interactive
+    lead_author: interactive
+    logo_path: '{runtime_paths.logo_path}'
+    output_name_template: '{user_inputs.region_name}InSAR处理报告.docx'
+  default_data_source: Sentinel-1
+  default_region_name: 北京
+  default_lead_author: yourname
+- type: toc
+- type: chapter
+  id: chapter_1
+  title: 1. 数据情况
+  children:
+  - type: metadata_table
+    source: mintpy_meta
+    fields:
+    - - 卫 星
+      - satellite
+    - - 波 段
+      - band
+    - - 波 长
+      - wavelength
+    - - 成像模式
+      - mode
+    - - swath_Num
+      - swath_Num
+    - - 空间分辨率
+      - resolution
+    - - 相对轨道号
+      - track
+    - - 升降轨
+      - direction
+    - - 中心入射角
+      - inc_angle
+    - - 中心方位角
+      - az_angle
+    - - 极化方式
+      - pol
+    - - 开始时间
+      - start_time
+    - - 结束时间
+      - end_time
+    - - 干涉对数量
+      - num_ifgram
+    - - 经纬度范围
+      - bbox
+  - type: table
+    title: 表{table_no} 选用SAR数据日期
+    source: obs_dates
+    renderer: date_grid
+    columns: 4
+- type: chapter
+  id: chapter_2
+  title: 2. 处理参数设置
+  children:
+  - type: software_versions
+    label: 处理软件
+    platform_source: mintpy_meta
+    stack_processor: auto
+  - type: kv_line
+    label: 时序估计方法
+    source: ts_method
+  - type: cfg_table
+    title: MintPy 参数配置
+    source: mintpy_cfg
+    filter:
+      exclude_values:
+      - auto
+      - 'no'
+- type: chapter
+  id: chapter_3
+  title: 3. 干涉数据质量评估
+  children:
+  - type: section
+    id: chapter_3_1
+    title: 3.1 干涉图网络
+    children:
+    - type: figure
+      asset: network_figure
+      caption: '{templates.captions.network}'
+    - type: figure
+      asset: coherence_history
+      caption: '{templates.captions.coherence_history}'
+    - type: figure
+      asset: coherence_matrix
+      caption: '{templates.captions.coherence_matrix}'
+  - type: section
+    id: chapter_3_2
+    title: 3.2 相干性
+    children:
+    - type: figure
+      asset: avg_spatial_coh
+      caption: '{templates.captions.avg_spatial_coh}'
+    - type: figure
+      asset: temporal_coh
+      caption: '{templates.captions.temporal_coh}'
+    - type: figure
+      asset: mask_conn_comp
+      caption: '{templates.captions.mask_conn_comp}'
+  - type: section
+    id: chapter_3_3
+    title: 3.3 相位堆栈
+    children:
+    - type: figure
+      asset: avg_phase_velocity
+      caption: '{templates.captions.avg_phase_velocity}'
+      max_height_cm: 12
+  - type: section
+    id: chapter_3_4
+    title: 3.4 相位解缠误差
+    children:
+    - type: figure
+      asset: unwrap_error
+      caption: '{templates.captions.unwrap_error}'
+      max_height_cm: 12
+  - type: section
+    id: chapter_3_5
+    title: 3.5 几何数据
+    children:
+    - type: figure
+      asset: geometry_radar
+      caption: '{templates.captions.geometry_radar}'
+      max_height_cm: 12
+  - type: section
+    id: chapter_3_6
+    title: 3.6 残余相位 RMS
+    children:
+    - type: figure
+      asset: residual_rms
+      caption: '{templates.captions.residual_rms}'
+      max_height_cm: 12
+    - type: text_file_line
+      source: reference_dates
+      template: '{templates.text.reference_dates}'
+    - type: text_file_line
+      source: exclude_dates
+      template: '{templates.text.exclude_dates}'
+      space_after_pt: 12
+- type: chapter
+  id: chapter_4
+  title: 4. 形变结果
+  children:
+  - type: section
+    id: chapter_4_1
+    title: 4.1 形变速率图
+    children:
+    - type: conditional
+      when:
+        asset_exists: velocity_map
+      then:
+      - type: figure
+        asset: velocity_map
+        caption: '{templates.captions.velocity_map}'
+      else:
+      - type: paragraph
+        text: '[图片缺失: velocity_DEM.png 或 velocity.png]'
+  - type: section
+    id: chapter_4_2
+    title: 4.2 VelocityStd
+    children:
+    - type: conditional
+      when:
+        asset_exists: velocity_std
+      then:
+      - type: figure
+        asset: velocity_std
+        caption: '{templates.captions.velocity_std}'
+      else:
+      - type: paragraph
+        text: '[图片缺失: velocity_std_plot.png]'
+  - type: section
+    id: chapter_4_3
+    title: 4.3 感兴趣目标点的时序形变图
+    children:
+    - type: conditional
+      when:
+        source_nonempty: poi_figures
+      then:
+      - type: repeat
+        source: poi_figures
+        as: item
+        children:
+        - type: figure
+          path: '{item.path}'
+          caption: '{templates.captions.poi_timeseries}'
+      else:
+      - type: paragraph
+        text: （未检测到感兴趣目标点图件）
+- type: chapter
+  id: chapter_5
+  title: 5. 解译分析
+  children:
+  - type: interactive_text
+    source: analysis_text
+    line_spacing: 1.5
+    first_line_indent_pt: 24
+    font_size_pt: 12
+    font_name_cn: 仿宋
