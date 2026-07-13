@@ -1,0 +1,55 @@
+# =========================
+# MintPy Word Report: Quickstart Config
+# =========================
+# Usage:
+# 1. Modify paths
+# 2. Set language:
+#    - zh-CN for Chinese report
+#    - en-US for English report
+# 3. Modify cover_defaults if needed
+# 4. Run pic2word.ipynb
+#
+# Note:
+# - This is the beginner-friendly config.
+# - If you need full control over report_structure / assets / templates,
+#   please use report_schema.yaml instead.
+
+schema_version: quickstart-1.1
+project_name: MintPy Word Auto Report
+language: zh-CN
+paths:
+  logo_path: /home/liyuxuan/penguin/pic2word/pic/logo.png
+  base_dir: /home/liyuxuan/penguin/data/beiminghe/mintpy
+  output_dir: /home/liyuxuan/penguin/pic2word/v7_mod/word
+cover_defaults:
+  data_source: Sentinel-1
+  region_name: 北京
+  lead_author: yourname
+  output_name_template: '{user_inputs.region_name}InSAR处理报告.docx'
+processing_defaults:
+  ts_method: SBAS
+  analysis_text: （请补充解译分析内容）
+report_options:
+  include_chapter_3: true
+  include_chapter_4: true
+  include_chapter_5: true
+  include_poi_section: auto
+  auto_page_break_after_chapter: true
+# === 新增：成图控制（可选，不写则使用内置默认值）===
+figure_generation:
+  mode: auto                        # "auto" | "manual" | "skip"
+  manual_points: []                 # mode=manual 时生效，如: [[36.5, 113.5], [36.6, 113.8]]
+  auto_params:
+    temporal_coh_threshold: 0.70
+    min_region_pixels: 30
+    max_regions: 10
+
+captions_override:
+  velocity_map: 图{figure_no} 形变速率图
+  velocity_std: 图{figure_no} VelocityStd
+  poi_timeseries: 图{figure_no} 感兴趣目标点{item_index}的时序形变图
+captions_override_en:
+  velocity_map: Figure {figure_no} Deformation velocity map.
+  velocity_std: Figure {figure_no} Velocity standard deviation.
+  poi_timeseries: Figure {figure_no} Time-series deformation of Point of Interest
+    {item_index}.

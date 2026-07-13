@@ -1,8 +1,15 @@
 # =========================
-# MintPy Word 报告：高级 schema 版
+# MintPy Word Report: Advanced Schema
 # =========================
-# 适合需要完全控制报告结构的用户。
-# 如果你只是想快速改路径、封面和章节开关，请改用 report_quickstart.yaml。
+# This file is for advanced users who want full control over:
+# - report_structure
+# - data_sources
+# - assets
+# - templates
+#
+# To generate a fully English report:
+# 1. Set project.language: en-US
+# 2. Optionally customize language_overrides.en
 
 schema_version: '2.0'
 project:
@@ -11,14 +18,19 @@ project:
   description: 基于 MintPy 结果自动生成 Word 报告
 runtime_paths:
   logo_path: /home/liyuxuan/penguin/pic2word/pic/logo.png
-  base_dir: /home/liyuxuan/penguin/data/Galapagos_s1/mintpy
+  base_dir: /home/liyuxuan/penguin/data/beiminghe/mintpy
   pic_dir: '{runtime_paths.base_dir}/pic'
-  output_dir: /home/liyuxuan/penguin/pic2word/v4_plus/word
+  output_dir: /home/liyuxuan/penguin/pic2word/v7_mod/word
   velocity_file: '{runtime_paths.base_dir}/velocity.h5'
   cfg_file: '{runtime_paths.pic_dir}/smallbaselineApp.cfg'
   rms_txt: '{runtime_paths.pic_dir}/rms_timeseriesResidual_ramp.txt'
   reference_date_txt: '{runtime_paths.pic_dir}/reference_date.txt'
   exclude_date_txt: '{runtime_paths.pic_dir}/exclude_date.txt'
+  # 成图输入文件路径（与 picture_auto_max10.ipynb 路径约定一致）
+  geo_velocity_file: '{runtime_paths.base_dir}/geo/geo_velocity.h5'
+  timeseries_file: '{runtime_paths.base_dir}/geo/geo_timeseries_ERA5_demErr.h5'
+  temporal_coh_file: '{runtime_paths.base_dir}/geo/geo_temporalCoherence.h5'
+  dem_file: '{runtime_paths.base_dir}/../DEM/elevation_cop.dem'
 defaults:
   font_cn: 仿宋
   font_en: Times New Roman
@@ -30,6 +42,26 @@ defaults:
   pdf_render_dpi: 300
   figure_numbering_scope: chapter
   table_numbering_scope: chapter
+
+# === 成图控制 ===
+figure_generation:
+  mode: auto                        # "auto" | "manual" | "skip"
+  manual_points: []                 # mode=manual 时生效
+  auto_params:
+    temporal_coh_threshold: 0.70    # 时间相干性掩膜阈值
+    min_region_pixels: 30           # 连通域最小像元数
+    max_regions: 10                 # 最多保留区域数
+    region_percentiles: [99.5, 99.0, 98.5, 98.0, 97.0, 95.0]
+  plot:
+    sub_lat: [36.21, 36.71]         # [min_lat, max_lat]
+    sub_lon: [112.99, 114.05]       # [min_lon, max_lon]
+    wrap_range: [-3, 3]
+    shade_az: 315
+    shade_alt: 45
+    shade_frac: 0.8
+    base_color: 0.5
+    shade_exag: 0.3
+    scalebar: [0.2, 0.8, 0.1]
 data_sources:
   mintpy_meta:
     type: mintpy_attribute
@@ -326,3 +358,59 @@ report_structure:
     first_line_indent_pt: 24
     font_size_pt: 12
     font_name_cn: 仿宋
+language_overrides:
+  en:
+    templates:
+      headings:
+        cover_title: 'Time-series InSAR Surface Deformation Processing and Analysis
+          Report
+
+          for {user_inputs.region_name} Using {user_inputs.data_source} Data'
+      text:
+        reference_dates: 'Reference dates: {value}'
+        exclude_dates: 'Excluded dates: {value}'
+    report_structure_overrides:
+      chapter_titles:
+        chapter_1: 1. Data Information
+        chapter_2: 2. Processing Parameters
+        chapter_3: 3. Interferometric Data Quality Assessment
+        chapter_4: 4. Deformation Results
+        chapter_5: 5. Interpretation Analysis
+      section_titles:
+        chapter_3_1: 3.1 Interferogram Network
+        chapter_3_2: 3.2 Coherence
+        chapter_3_3: 3.3 Phase Stack
+        chapter_3_4: 3.4 Phase Unwrapping Error
+        chapter_3_5: 3.5 Geometry
+        chapter_3_6: 3.6 Residual Phase RMS
+        chapter_4_1: 4.1 Deformation Velocity Map
+        chapter_4_2: 4.2 Velocity Standard Deviation
+        chapter_4_3: 4.3 Time-Series Deformation of Points of Interest
+    metadata_fields:
+      satellite: Satellite
+      band: Band
+      wavelength: Wavelength
+      mode: Acquisition Mode
+      swath_Num: Swath Number
+      resolution: Spatial Resolution
+      track: Track Number
+      direction: Orbit Direction
+      inc_angle: Incidence Angle
+      az_angle: Azimuth Angle
+      pol: Polarization
+      start_time: Start Date
+      end_time: End Date
+      num_ifgram: Number of Interferograms
+      bbox: Bounding Box
+    cover_defaults:
+      data_source: Sentinel-1
+      region_name: Beijing
+      lead_author: yourname
+      output_name_template: '{user_inputs.region_name}_InSAR_Report.docx'
+    block_labels:
+      software_versions: Processing software
+    kv_labels:
+      ts_method: Time-series estimation method
+    interactive_defaults:
+      ts_method: SBAS
+      analysis_text: (Please add interpretation analysis.)
